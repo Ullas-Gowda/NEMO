@@ -1,29 +1,26 @@
 import paho.mqtt.client as mqtt
+import json
+import time
 
-BROKER = (
-    "192.168.137.1"  # Use the IP address that successfully pings your Windows server
-)
+BROKER = "192.168.103.124"
 PORT = 1883
-TOPIC = "test"  # Use the test topic for connectivity check
-
-import paho.mqtt.client as mqtt
-
-
-def on_connect(client, userdata, flags, rc):
-    if rc == 0:
-        print("Connected to MQTT broker!")
-        client.subscribe(TOPIC)
-    else:
-        print(f"Failed to connect, return code {rc}")
-
-
-def on_message(client, userdata, msg):
-    print(f"Received command for {TOPIC}: {msg.payload.decode()}")
-
+TOPIC = "test"
+USERNAME = "awais"
+PASSWORD = "Archu2025"
 
 client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-
+client.username_pw_set(USERNAME, PASSWORD)
 client.connect(BROKER, PORT, 60)
-client.loop_forever()
+
+# Fake sensor data
+sensor_data = {
+    "temp": 24.5,
+    "humidity": 55,
+    "unit": "C"
+}
+
+# Publish as JSON string
+client.publish(TOPIC, json.dumps(sensor_data))
+print("📤 Published sensor data!")
+
+client.disconnect()
